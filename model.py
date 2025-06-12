@@ -26,6 +26,9 @@ class Preprocessor:
         else:
             print("Given Image Path not found.")
             return np.array([])
+
+    def FromData(self, img):
+        return self.DoPreprocessing(img)
     
     def DoPreprocessing(self, img):
         img = img.resize( self.size, Image.BILINEAR)
