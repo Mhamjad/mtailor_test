@@ -1,8 +1,12 @@
+import os
+import sys
 import onnxruntime as ort
 import numpy as np
 from PIL import Image
- 
+
 from utils import ReadKeyMapValueFromFile
+from convert_to_onnx import ConvertToOnnx
+
 class Preprocessor:
     def __init__(self):
         self.mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
@@ -16,8 +20,12 @@ class Preprocessor:
         self.std = np.array(value, dtype=np.float32)
         
     def FromFile(self, path):
-        img = Image.open(path).convert("RGB")
-        return self.DoPreprocessing(img)
+        if os.path.exists(path):
+            img = Image.open(path).convert("RGB")
+            return self.DoPreprocessing(img)
+        else:
+            print("Given Image Path not found.")
+            return np.array([])
     
     def DoPreprocessing(self, img):
         img = img.resize( self.size, Image.BILINEAR)
@@ -29,9 +37,23 @@ class Preprocessor:
  
 class OnnxClassifier:
     def __init__(self, model_path: str = "/app/classifier.onnx"):
-        self.session = ort.InferenceSession(model_path)
         self.classes = ReadKeyMapValueFromFile("/app/classes.txt")
-        
+        self.onnx_path = model_path
+        self.ConvertPytorchToOnnx(model_path)
+        self.session = ort.InferenceSession(self.onnx_path)
+    
+    def ConvertPytorchToOnnx(self, model_path):
+        if os.path.exists(model_path):
+            if model_path[-4:] != "onnx":
+                res = ConvertToOnnx(model_path, "/app/classifier.onnx")
+                if not res:
+                    print("Unable to convert to Onnx")
+                    sys.exit(1)
+                self.onnx_path = "/app/classifier.onnx"
+        else:
+            print("Given model path is not valid")
+            sys.exit(1)
+         
     def Predict(self, img_tensor):
         result = self.session.run(
             ["probabilities"],
@@ -40,6 +62,8 @@ class OnnxClassifier:
         return result[0]
 
     def GetOutput(self, img_tensor):
+        if img_tensor.size == 0:
+            return "Unknown", 0.0
         result = self.Predict(img_tensor)
         max_index, max_value = max(enumerate(result[0]), key=lambda x: x[1])
         return self.classes[max_index], max_value

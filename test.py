@@ -68,3 +68,24 @@ def test_infered_class(sample_image_path):
     onnx_classifier = OnnxClassifier(model_path="/app/classifier.onnx")
     out_class, out_score = onnx_classifier.GetOutput(np_tensor)
     assert out_class == "tench, Tinca tinca"
+
+def test_infered_when_pytorch_weights(sample_image_path):
+    preprocessor = Preprocessor()
+    np_tensor = preprocessor.FromFile(sample_image_path)
+    onnx_classifier = OnnxClassifier(model_path="/app/weights/pytorch_model_weights.pth")
+    out_class, out_score = onnx_classifier.GetOutput(np_tensor)
+    assert out_class == "tench, Tinca tinca"
+
+def test_infered_when_image_not_found():
+    preprocessor = Preprocessor()
+    np_tensor = preprocessor.FromFile("/dummy")
+    onnx_classifier = OnnxClassifier(model_path="/app/weights/pytorch_model_weights.pth")
+    out_class, out_score = onnx_classifier.GetOutput(np_tensor)
+    assert out_class == "Unknown"
+    assert out_score == 0.0
+
+def test_system_exit_on_wrong_path(sample_image_path):
+    with pytest.raises(SystemExit) as e:
+        onnx_classifier = OnnxClassifier(model_path="/dummy.pth")
+    assert e.type == SystemExit
+    assert e.value.code == 1

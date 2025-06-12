@@ -1,6 +1,8 @@
 # Dockerfile
 FROM pytorch/pytorch:2.6.0-cuda11.8-cudnn9-runtime
- 
+
+ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -10,10 +12,6 @@ RUN apt update && apt install -y \
     build-essential \
     libssl-dev \
     zlib1g-dev \
-    libncurses5-dev \
-    libncursesw5-dev \
-    libreadline-dev \
-    libsqlite3-dev \
     libgdbm-dev \
     libdb5.3-dev \
     libbz2-dev \
