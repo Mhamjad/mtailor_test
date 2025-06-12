@@ -40,7 +40,7 @@ class OnnxClassifier:
         self.classes = ReadKeyMapValueFromFile("/app/classes.txt")
         self.onnx_path = model_path
         self.ConvertPytorchToOnnx(model_path)
-        self.session = ort.InferenceSession(self.onnx_path)
+        self.session = self.CreateOnnxSession(self.onnx_path)
     
     def ConvertPytorchToOnnx(self, model_path):
         if os.path.exists(model_path):
@@ -53,11 +53,20 @@ class OnnxClassifier:
         else:
             print("Given model path is not valid")
             sys.exit(1)
-         
+    
+    def CreateOnnxSession(self, onnx_path):
+        providers = ort.get_available_providers()
+        if "CUDAExecutionProvider" in providers:
+            print("Using GPU for ONNX inference.")
+            return ort.InferenceSession(onnx_path, providers=["CUDAExecutionProvider"])
+        else:
+            print("CUDA not available, using CPU for ONNX inference.")
+            return ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
+        
     def Predict(self, img_tensor):
         result = self.session.run(
             ["probabilities"],
-            {"input": img_tensor}
+            {"input": img_tensor.astype(np.float32)}
         )
         return result[0]
 
