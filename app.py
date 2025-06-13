@@ -12,7 +12,7 @@ ONNX_PATH = "/app/classifier.onnx"
 preprocessor = Preprocessor()
 onnx_classifier = OnnxClassifier(model_path=ONNX_PATH)
 
-@app.post("/predict")
+@app.post("/run")
 async def predict(file: UploadFile = File(...)):
     image_bytes = await file.read()
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")

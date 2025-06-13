@@ -5,31 +5,31 @@ A image classification project which run on cerebrium and serve endpoint for ima
 ## Project Structure
 mtailor_test/
 
-├── samples/ # sample image files
+├── samples/ #sample image files
 
-├── weights/ # pytorch weights which will be converted to onnx for this project.
+├── weights/ #pytorch weights which will be converted to onnx for this project.
 
-├── requirements.txt # Project dependencies
+├── requirements.txt #Project dependencies
 
-├── README.md # Project overview and instructions
+├── README.md #Project overview and instructions
 
-├── Dokcerfile # Dockerfile which will make container and start fastapi server at 8080 at local host
+├── Dokcerfile #Dockerfile which will make container and start fastapi server at 8080 at local host
 
-└── .gitignore # Ignored files and folders
+└── .gitignore #Ignored files and folders
 
-└── app.py # FastApi based endpoint which serves results.
+└── app.py #FastApi based endpoint which serves results.
 
-└── convert_to_onnx.py # A file responsible to convert pytorch weights to onnx
+└── convert_to_onnx.py #A file responsible to convert pytorch weights to onnx
 
-└── model.py # Responsible to do preprocessing and run onnx inference
+└── model.py #Responsible to do preprocessing and run onnx inference
 
 ├── pytorch_model.py # provided file
 
-├── test.py # A basic test cases to test system is running fine or not.
+├── test.py #A basic test cases to test system is running fine or not.
 
 ├── utils.py 
 
-├── test_server.py # A test file which will request fastapi to get results from service deployed on cerebrium
+├── test_server.py #A test file which will request fastapi to get results from service deployed on cerebrium
 
 ## Requirements
 1: Ubuntu OS
